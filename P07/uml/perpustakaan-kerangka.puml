@@ -1,0 +1,99 @@
+@startuml perpustakaan-class
+title Sistem Perpustakaan — Class Diagram (Sesi 7)
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+package model {
+
+  abstract class Koleksi {
+    - nomorInduk : String
+    - judul : String
+    - penulis : String
+    - tahun : int
+    - jumlahEksemplar : int
+    + {abstract} masaPinjamHari() : int
+    + {abstract} bolehDipinjam() : boolean
+    + tersedia() : boolean
+  }
+
+  ' TODO 1: tambahkan tiga turunan Koleksi — Buku, Majalah, Skripsi.
+  '         Perhatikan masa pinjam masing-masing.
+  class Buku {
+    + masaPinjamHari() : int
+    + bolehDipinjam() : boolean
+  }
+
+  class Majalah {
+    + masaPinjamHari() : int
+    + bolehDipinjam() : boolean
+  }
+
+  class Skripsi {
+    + masaPinjamHari() : int
+    + bolehDipinjam() : boolean
+  }
+
+  class Bab {
+    - nomor : int
+    - judul : String
+  }
+
+  ' TODO 2: tambahkan kelas Anggota dan Peminjaman beserta atributnya.
+  class Anggota {
+    - nomorAnggota : String
+    - nama : String
+  }
+
+  class Peminjaman {
+    - tanggalPinjam : Date
+    - tanggalJatuhTempo : Date
+    - tanggalKembali : Date
+  }
+
+  ' TODO 3: tambahkan enum StatusKoleksi dan enum/kelas JenisKeanggotaan.
+  enum StatusKoleksi {
+    TERSEDIA
+    DIPINJAM
+    RUSAK
+    HILANG
+  }
+
+  enum JenisKeanggotaan {
+    MAHASISWA
+    DOSEN
+    KEHORMATAN
+  }
+
+  ' ── RELASI ───────────────────────────────────────────────
+  ' TODO 4: lengkapi relasi berikut. Untuk setiap relasi, tentukan
+  '         derajat keterikatannya DAN tulis multiplicity di kedua ujung.
+  Koleksi <|-- Buku
+  Koleksi <|-- Majalah
+  Koleksi <|-- Skripsi
+
+  Buku "1" *-- "0..*" Bab : memuat >
+  Anggota "1" o-- "0..3" Peminjaman : melakukan >
+  Peminjaman "*" --> "1" Koleksi : meminjam >
+
+  ' TODO 5: relasi ini SALAH. Perbaiki.
+  ' Relasi Koleksi <|-- Bab dihapus/digantikan dengan Komposisi Buku *-- Bab.
+
+}
+
+package service {
+  class PerpustakaanService {
+    + tambahKoleksi(k : Koleksi) : void
+    + daftarkanAnggota(a : Anggota) : void
+    + pinjam(nomorAnggota : String, nomorInduk : String) : Peminjaman
+    + kembalikan(nomorAnggota : String, nomorInduk : String) : void
+    + cariKoleksi(nomorInduk : String) : Koleksi
+  }
+
+  ' TODO 6: tambahkan relasi antara PerpustakaanService dengan Koleksi
+  '         dan Anggota. Agregasi atau komposisi? Beri alasannya di analisis.md.
+  PerpustakaanService "1" o-- "*" Koleksi
+  PerpustakaanService "1" o-- "*" Anggota
+}
+
+@enduml
